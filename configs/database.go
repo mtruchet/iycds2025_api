@@ -22,7 +22,7 @@ type DatabaseConfig struct {
 // GetDatabaseConfig retorna la configuración de la base de datos según el entorno
 func GetDatabaseConfig() DatabaseConfig {
 	appEnv := os.Getenv("APP_ENV")
-	
+
 	var config DatabaseConfig
 
 	if appEnv == "production" {
@@ -31,7 +31,7 @@ func GetDatabaseConfig() DatabaseConfig {
 			Host:     getEnvOrDefault("PROD_DB_HOST", "localhost"),
 			Port:     getEnvOrDefault("PROD_DB_PORT", "3306"),
 			User:     getEnvOrDefault("PROD_DB_USER", "root"),
-			Password: getEnvOrDefault("PROD_DB_PASSWORD", "root"),
+			Password: getEnvOrDefault("PROD_DB_PASSWORD", ""),
 			DBName:   getEnvOrDefault("PROD_DB_NAME", "iycds2025"),
 		}
 		log.Println("Using production database configuration")
@@ -41,7 +41,7 @@ func GetDatabaseConfig() DatabaseConfig {
 			Host:     getEnvOrDefault("DB_HOST", "localhost"),
 			Port:     getEnvOrDefault("DB_PORT", "3306"),
 			User:     getEnvOrDefault("DB_USER", "root"),
-			Password: getEnvOrDefault("DB_PASSWORD", "root"),
+			Password: getEnvOrDefault("DB_PASSWORD", ""),
 			DBName:   getEnvOrDefault("DB_NAME", "iycds2025"),
 		}
 		log.Println("Using development database configuration")
