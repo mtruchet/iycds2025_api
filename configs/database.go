@@ -26,35 +26,27 @@ func GetDatabaseConfig() DatabaseConfig {
 	var config DatabaseConfig
 
 	if appEnv == "production" {
-		// Configuración para entorno de producción (si fuera necesario)
+		// Configuración para Railway (producción)
 		config = DatabaseConfig{
-			Host:     getEnvOrDefault("PROD_DB_HOST", "localhost"),
-			Port:     getEnvOrDefault("PROD_DB_PORT", "3306"),
-			User:     getEnvOrDefault("PROD_DB_USER", "root"),
-			Password: getEnvOrDefault("PROD_DB_PASSWORD", ""),
-			DBName:   getEnvOrDefault("PROD_DB_NAME", "iycds2025"),
+			Host:     os.Getenv("MYSQLHOST"),
+			Port:     os.Getenv("MYSQLPORT"),
+			User:     os.Getenv("MYSQLUSER"),
+			Password: os.Getenv("MYSQLPASSWORD"),
+			DBName:   os.Getenv("MYSQLDATABASE"),
 		}
-		log.Println("Using production database configuration")
+		log.Println("Using Railway MySQL configuration")
 	} else {
 		// Configuración para entorno de desarrollo (local)
 		config = DatabaseConfig{
-			Host:     getEnvOrDefault("DB_HOST", "localhost"),
-			Port:     getEnvOrDefault("DB_PORT", "3306"),
-			User:     getEnvOrDefault("DB_USER", "root"),
-			Password: getEnvOrDefault("DB_PASSWORD", ""),
-			DBName:   getEnvOrDefault("DB_NAME", "iycds2025"),
+			Host:     os.Getenv("DB_HOST"),
+			Port:     os.Getenv("DB_PORT"),
+			User:     os.Getenv("DB_USER"),
+			Password: os.Getenv("DB_PASSWORD"),
+			DBName:   os.Getenv("DB_NAME"),
 		}
 		log.Println("Using development database configuration")
 	}
 	return config
-}
-
-// Helper para obtener variable de entorno con valor por defecto
-func getEnvOrDefault(key, defaultValue string) string {
-	if value := os.Getenv(key); value != "" {
-		return value
-	}
-	return defaultValue
 }
 
 // ConnectDatabase establece la conexión con la base de datos MySQL
