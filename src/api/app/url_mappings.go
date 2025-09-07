@@ -2,6 +2,7 @@ package app
 
 import (
 	"iycds2025_api/src/api/infrastructure/dependencies"
+	"iycds2025_api/src/api/middleware"
 
 	"github.com/gin-gonic/gin"
 )
@@ -13,9 +14,9 @@ func configureURLMappings(router *gin.Engine, handlers *dependencies.HandlerCont
 	// Grupo de API
 	group := router.Group("/api")
 
-	// Endpoints públicos para autenticación
-	group.POST("/user/login", handlers.UserLogin.Handle)
-	group.POST("/user/register", handlers.UserRegister.Handle)
-	group.POST("/user/forgot-password", handlers.PasswordForgot.Handle)
-	group.POST("/user/reset-password", handlers.PasswordReset.Handle)
+	// Endpoints públicos para autenticación con rate limiting
+	group.POST("/user/login", middleware.StrictRateLimit(), handlers.UserLogin.Handle)
+	group.POST("/user/register", middleware.StandardRateLimit(), handlers.UserRegister.Handle)
+	group.POST("/user/forgot-password", middleware.StrictRateLimit(), handlers.PasswordForgot.Handle)
+	group.POST("/user/reset-password", middleware.StandardRateLimit(), handlers.PasswordReset.Handle)
 }
