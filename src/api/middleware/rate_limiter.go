@@ -79,11 +79,13 @@ func (rl *RateLimiter) RateLimit() gin.HandlerFunc {
 
 // Implementa diferentes limitadores para diferentes niveles de seguridad
 var (
-	// Limitar a 5 solicitudes cada 60 segundos (para endpoints críticos como login)
-	StrictRateLimiter = NewRateLimiter(5, 60*time.Second)
+	// DESACTIVADO TEMPORALMENTE - Limitar a 1000 solicitudes cada 60 segundos (para endpoints críticos como login)
+	// Originalmente era: 5 solicitudes cada 60 segundos
+	StrictRateLimiter = NewRateLimiter(1000, 60*time.Second)
 
-	// Limitar a 10 solicitudes cada 60 segundos (para endpoints menos críticos)
-	StandardRateLimiter = NewRateLimiter(10, 60*time.Second)
+	// DESACTIVADO TEMPORALMENTE - Limitar a 2000 solicitudes cada 60 segundos (para endpoints menos críticos)
+	// Originalmente era: 10 solicitudes cada 60 segundos
+	StandardRateLimiter = NewRateLimiter(2000, 60*time.Second)
 )
 
 // Middleware convenientes para diferentes niveles de protección
