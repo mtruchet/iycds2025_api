@@ -14,16 +14,17 @@ import (
 )
 
 type HandlerContainer struct {
-	Ping           api.Handler
-	UserLogin      api.Handler
-	UserRegister   api.Handler
-	PasswordForgot api.Handler
-	PasswordReset  api.Handler
-	ServiceCreate  api.Handler
-	ServiceUpdate  api.Handler
-	ServiceDelete  api.Handler
-	ServiceList    api.Handler
-	Categories     api.Handler
+	Ping            api.Handler
+	UserLogin       api.Handler
+	UserRegister    api.Handler
+	PasswordForgot  api.Handler
+	PasswordReset   api.Handler
+	ServiceCreate   api.Handler
+	ServiceUpdate   api.Handler
+	ServiceDelete   api.Handler
+	ServiceList     api.Handler
+	ServiceListAll  api.Handler
+	Categories      api.Handler
 }
 
 func Start() *HandlerContainer {
@@ -82,6 +83,10 @@ func Start() *HandlerContainer {
 		Service: serviceRepo,
 	}
 
+	listAllServicesUseCase := &service.ListAllServicesImpl{
+		Service: serviceRepo,
+	}
+
 	// Handlers
 	handlers := HandlerContainer{}
 
@@ -109,6 +114,9 @@ func Start() *HandlerContainer {
 	}
 	handlers.ServiceList = &apiHandlers.ServiceListHandler{
 		ListMyServices: listMyServicesUseCase,
+	}
+	handlers.ServiceListAll = &apiHandlers.ServiceListAllHandler{
+		ListAllServices: listAllServicesUseCase,
 	}
 	handlers.Categories = &apiHandlers.CategoriesHandler{}
 

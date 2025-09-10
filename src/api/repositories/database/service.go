@@ -127,6 +127,46 @@ func (r *ServiceRepository) GetByUserID(ctx context.Context, userID int64) ([]*e
 	return services, nil
 }
 
+func (r *ServiceRepository) GetAllActive(ctx context.Context) ([]*entities.Service, error) {
+	query := `
+		SELECT id, title, description, user_id, category, price, availability, zones, status, image_url, created_at, updated_at
+		FROM services
+		WHERE status = 'active'
+		ORDER BY created_at DESC
+	`
+
+	rows, err := r.db.QueryContext(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var services []*entities.Service
+	for rows.Next() {
+		var service entities.Service
+		err := rows.Scan(
+			&service.ID,
+			&service.Title,
+			&service.Description,
+			&service.UserID,
+			&service.Category,
+			&service.Price,
+			&service.Availability,
+			&service.Zones,
+			&service.Status,
+			&service.ImageURL,
+			&service.CreatedAt,
+			&service.UpdatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+		services = append(services, &service)
+	}
+
+	return services, nil
+}
+
 func (r *ServiceRepository) Update(ctx context.Context, id int64, serviceReq *entities.ServiceUpdate, userID int64) (*entities.Service, error) {
 	// Verificar que el servicio pertenece al usuario
 	existing, err := r.GetByID(ctx, id)

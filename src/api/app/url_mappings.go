@@ -24,6 +24,9 @@ func configureURLMappings(router *gin.Engine, handlers *dependencies.HandlerCont
 	// Endpoint público para obtener categorías
 	group.GET("/categories", handlers.Categories.Handle)
 
+	// Endpoint público para obtener todos los servicios
+	group.GET("/services", handlers.ServiceListAll.Handle)
+
 	// Endpoints protegidos que requieren autenticación
 	protected := group.Group("/")
 	protected.Use(middleware.AuthMiddleware())
