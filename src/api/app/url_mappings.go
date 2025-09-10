@@ -20,4 +20,18 @@ func configureURLMappings(router *gin.Engine, handlers *dependencies.HandlerCont
 	
 	group.POST("/user/forgot-password", middleware.StrictRateLimit(), handlers.PasswordForgot.Handle)
 	group.POST("/user/reset-password", middleware.StandardRateLimit(), handlers.PasswordReset.Handle)
+
+	// Endpoint público para obtener categorías
+	group.GET("/categories", handlers.Categories.Handle)
+
+	// Endpoints protegidos que requieren autenticación
+	protected := group.Group("/")
+	protected.Use(middleware.AuthMiddleware())
+	{
+		// CRUD de servicios
+		protected.POST("/services", middleware.StandardRateLimit(), handlers.ServiceCreate.Handle)
+		protected.PUT("/services/:id", middleware.StandardRateLimit(), handlers.ServiceUpdate.Handle)
+		protected.PATCH("/services/:id", middleware.StandardRateLimit(), handlers.ServiceDelete.Handle)
+		protected.GET("/my-services", middleware.StandardRateLimit(), handlers.ServiceList.Handle)
+	}
 }

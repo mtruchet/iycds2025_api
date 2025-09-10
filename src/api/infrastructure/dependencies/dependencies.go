@@ -7,6 +7,7 @@ import (
 	"iycds2025_api/src/api/core/usecases/login"
 	"iycds2025_api/src/api/core/usecases/password"
 	"iycds2025_api/src/api/core/usecases/register"
+	"iycds2025_api/src/api/core/usecases/service"
 	"iycds2025_api/src/api/infrastructure/entrypoints/api"
 	apiHandlers "iycds2025_api/src/api/infrastructure/entrypoints/api/handlers"
 	"iycds2025_api/src/api/repositories/database"
@@ -18,6 +19,11 @@ type HandlerContainer struct {
 	UserRegister   api.Handler
 	PasswordForgot api.Handler
 	PasswordReset  api.Handler
+	ServiceCreate  api.Handler
+	ServiceUpdate  api.Handler
+	ServiceDelete  api.Handler
+	ServiceList    api.Handler
+	Categories     api.Handler
 }
 
 func Start() *HandlerContainer {
@@ -28,6 +34,8 @@ func Start() *HandlerContainer {
 	userRepo := &database.UserRepository{
 		DB: db,
 	}
+
+	serviceRepo := database.NewServiceRepository(db)
 
 	// Services
 	emailService := configs.NewEmailService()
@@ -57,6 +65,23 @@ func Start() *HandlerContainer {
 		User: userRepo,
 	}
 
+	// Service use cases
+	createServiceUseCase := &service.CreateServiceImpl{
+		Service: serviceRepo,
+	}
+
+	updateServiceUseCase := &service.UpdateServiceImpl{
+		Service: serviceRepo,
+	}
+
+	deleteServiceUseCase := &service.DeleteServiceImpl{
+		Service: serviceRepo,
+	}
+
+	listMyServicesUseCase := &service.ListMyServicesImpl{
+		Service: serviceRepo,
+	}
+
 	// Handlers
 	handlers := HandlerContainer{}
 
@@ -73,6 +98,19 @@ func Start() *HandlerContainer {
 	handlers.PasswordReset = &apiHandlers.PasswordReset{
 		UseCase: resetPasswordUseCase,
 	}
+	handlers.ServiceCreate = &apiHandlers.ServiceCreateHandler{
+		CreateService: createServiceUseCase,
+	}
+	handlers.ServiceUpdate = &apiHandlers.ServiceUpdateHandler{
+		UpdateService: updateServiceUseCase,
+	}
+	handlers.ServiceDelete = &apiHandlers.ServiceDeleteHandler{
+		DeleteService: deleteServiceUseCase,
+	}
+	handlers.ServiceList = &apiHandlers.ServiceListHandler{
+		ListMyServices: listMyServicesUseCase,
+	}
+	handlers.Categories = &apiHandlers.CategoriesHandler{}
 
 	return &handlers
 }
