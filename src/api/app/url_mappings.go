@@ -17,7 +17,7 @@ func configureURLMappings(router *gin.Engine, handlers *dependencies.HandlerCont
 	// Endpoints públicos para autenticación con rate limiting
 	group.POST("/user/login", middleware.StrictRateLimit(), handlers.UserLogin.Handle)
 	group.POST("/user/register", middleware.StandardRateLimit(), handlers.UserRegister.Handle)
-	
+
 	group.POST("/user/forgot-password", middleware.StrictRateLimit(), handlers.PasswordForgot.Handle)
 	group.POST("/user/reset-password", middleware.StandardRateLimit(), handlers.PasswordReset.Handle)
 
@@ -26,6 +26,9 @@ func configureURLMappings(router *gin.Engine, handlers *dependencies.HandlerCont
 
 	// Endpoint público para obtener todos los servicios
 	group.GET("/services", handlers.ServiceListAll.Handle)
+
+	// Endpoint público para obtener un servicio por ID
+	group.GET("/services/:id", handlers.ServiceGetByID.Handle)
 
 	// Endpoints protegidos que requieren autenticación
 	protected := group.Group("/")

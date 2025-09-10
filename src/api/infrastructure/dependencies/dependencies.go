@@ -24,6 +24,7 @@ type HandlerContainer struct {
 	ServiceDelete   api.Handler
 	ServiceList     api.Handler
 	ServiceListAll  api.Handler
+	ServiceGetByID  api.Handler
 	Categories      api.Handler
 }
 
@@ -87,6 +88,10 @@ func Start() *HandlerContainer {
 		Service: serviceRepo,
 	}
 
+	getServiceByIDUseCase := &service.GetServiceByIDImpl{
+		Service: serviceRepo,
+	}
+
 	// Handlers
 	handlers := HandlerContainer{}
 
@@ -117,6 +122,9 @@ func Start() *HandlerContainer {
 	}
 	handlers.ServiceListAll = &apiHandlers.ServiceListAllHandler{
 		ListAllServices: listAllServicesUseCase,
+	}
+	handlers.ServiceGetByID = &apiHandlers.ServiceGetByIDHandler{
+		GetServiceByID: getServiceByIDUseCase,
 	}
 	handlers.Categories = &apiHandlers.CategoriesHandler{}
 
