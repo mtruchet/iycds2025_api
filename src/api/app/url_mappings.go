@@ -37,7 +37,8 @@ func configureURLMappings(router *gin.Engine, handlers *dependencies.HandlerCont
 		// CRUD de servicios
 		protected.POST("/services", middleware.StandardRateLimit(), handlers.ServiceCreate.Handle)
 		protected.PUT("/services/:id", middleware.StandardRateLimit(), handlers.ServiceUpdate.Handle)
-		protected.PATCH("/services/:id", middleware.StandardRateLimit(), handlers.ServiceDelete.Handle)
+		protected.DELETE("/services/:id", middleware.StandardRateLimit(), handlers.ServiceDelete.Handle)
+		protected.PATCH("/services/:id/status", middleware.StandardRateLimit(), handlers.ServiceUpdateStatus.Handle)
 		protected.GET("/my-services", middleware.StandardRateLimit(), handlers.ServiceList.Handle)
 	}
 }

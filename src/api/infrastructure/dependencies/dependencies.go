@@ -14,18 +14,19 @@ import (
 )
 
 type HandlerContainer struct {
-	Ping            api.Handler
-	UserLogin       api.Handler
-	UserRegister    api.Handler
-	PasswordForgot  api.Handler
-	PasswordReset   api.Handler
-	ServiceCreate   api.Handler
-	ServiceUpdate   api.Handler
-	ServiceDelete   api.Handler
-	ServiceList     api.Handler
-	ServiceListAll  api.Handler
-	ServiceGetByID  api.Handler
-	Categories      api.Handler
+	Ping                api.Handler
+	UserLogin           api.Handler
+	UserRegister        api.Handler
+	PasswordForgot      api.Handler
+	PasswordReset       api.Handler
+	ServiceCreate       api.Handler
+	ServiceUpdate       api.Handler
+	ServiceDelete       api.Handler
+	ServiceUpdateStatus api.Handler
+	ServiceList         api.Handler
+	ServiceListAll      api.Handler
+	ServiceGetByID      api.Handler
+	Categories          api.Handler
 }
 
 func Start() *HandlerContainer {
@@ -92,6 +93,10 @@ func Start() *HandlerContainer {
 		Service: serviceRepo,
 	}
 
+	deleteServiceUseCase := &service.DeleteServiceImpl{
+		Service: serviceRepo,
+	}
+
 	// Handlers
 	handlers := HandlerContainer{}
 
@@ -114,7 +119,10 @@ func Start() *HandlerContainer {
 	handlers.ServiceUpdate = &apiHandlers.ServiceUpdateHandler{
 		UpdateService: updateServiceUseCase,
 	}
-	handlers.ServiceDelete = &apiHandlers.ServiceUpdateStatusHandler{
+	handlers.ServiceDelete = &apiHandlers.ServiceDeleteHandler{
+		DeleteService: deleteServiceUseCase,
+	}
+	handlers.ServiceUpdateStatus = &apiHandlers.ServiceUpdateStatusHandler{
 		UpdateStatusService: updateStatusUseCase,
 	}
 	handlers.ServiceList = &apiHandlers.ServiceListHandler{

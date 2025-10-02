@@ -102,6 +102,27 @@ Content-Type: application/json
 }
 ```
 
+### Eliminar Servicio (DELETE definitivo)
+```
+DELETE http://localhost:8080/api/services/1
+Authorization: Bearer {token}
+```
+
+**Respuesta esperada (200 OK):**
+```json
+{
+    "message": "Service deleted successfully"
+}
+```
+
+**Errores posibles:**
+- 401 Unauthorized: Token inválido o no proporcionado
+- 403 Forbidden: El servicio no pertenece al usuario
+- 404 Not Found: Servicio no encontrado
+- 500 Internal Server Error: Error del servidor
+
+**Nota importante:** Este endpoint elimina el servicio de manera DEFINITIVA de la base de datos. Para cambiar el estado del servicio a inactivo, usar el endpoint PATCH `/services/{id}/status`.
+
 ## Importar en Postman
 
 1. Abrir Postman
@@ -197,6 +218,25 @@ Content-Type: application/json
                     "host": ["localhost"],
                     "port": "8080",
                     "path": ["api", "auth", "reset-password"]
+                }
+            }
+        },
+        {
+            "name": "Delete Service",
+            "request": {
+                "method": "DELETE",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {token}"
+                    }
+                ],
+                "url": {
+                    "raw": "http://localhost:8080/api/services/1",
+                    "protocol": "http",
+                    "host": ["localhost"],
+                    "port": "8080",
+                    "path": ["api", "services", "1"]
                 }
             }
         }
