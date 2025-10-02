@@ -199,3 +199,76 @@ func (r *UserRepository) ResetPassword(ctx context.Context, token string, newPas
 	// Commit de la transacción
 	return tx.Commit()
 }
+
+// GetByID obtiene un usuario por su ID
+func (r *UserRepository) GetByID(ctx context.Context, userID int64) (*entities.User, error) {
+	var user entities.User
+	query := `SELECT id, name, email, password, locality, province, phone, first_login, created_at, updated_at FROM users WHERE id = ?`
+
+	err := r.DB.QueryRowContext(ctx, query, userID).Scan(
+		&user.ID, &user.Name, &user.Email, &user.Password, &user.Locality,
+		&user.Province, &user.Phone, &user.FirstLogin, &user.CreatedAt, &user.UpdatedAt,
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil // Usuario no encontrado
+		}
+		return nil, err
+	}
+
+	return &user, nil
+}
+
+// Update actualiza la información de un usuario
+func (r *UserRepository) Update(ctx context.Context, userID int64, userUpdate *entities.UserUpdate) (*entities.User, error) {
+	// Construir query dinámico basado en campos presentes
+	setParts := []string{}
+	args := []interface{}{}
+
+	if userUpdate.Name != "" {
+		setParts = append(setParts, "name = ?")
+		args = append(args, userUpdate.Name)
+	}
+	if userUpdate.Email != "" {
+		setParts = append(setParts, "email = ?")
+		args = append(args, userUpdate.Email)
+	}
+	if userUpdate.Locality != "" {
+		setParts = append(setParts, "locality = ?")
+		args = append(args, userUpdate.Locality)
+	}
+	if userUpdate.Province != "" {
+		setParts = append(setParts, "province = ?")
+		args = append(args, userUpdate.Province)
+	}
+	if userUpdate.Phone != "" {
+		setParts = append(setParts, "phone = ?")
+		args = append(args, userUpdate.Phone)
+	}
+
+	if len(setParts) == 0 {
+		// Si no hay cambios, retornar el usuario actual
+		return r.GetByID(ctx, userID)
+	}
+
+	// Agregar updated_at y userID al final
+	setParts = append(setParts, "updated_at = NOW()")
+	args = append(args, userID)
+
+	query := "UPDATE users SET "
+	for i, part := range setParts {
+		if i > 0 {
+			query += ", "
+		}
+		query += part
+	}
+	query += " WHERE id = ?"
+
+	_, err := r.DB.ExecContext(ctx, query, args...)
+	if err != nil {
+		return nil, err
+	}
+
+	// Retornar el usuario actualizado
+	return r.GetByID(ctx, userID)
+}

@@ -34,6 +34,9 @@ func configureURLMappings(router *gin.Engine, handlers *dependencies.HandlerCont
 	protected := group.Group("/")
 	protected.Use(middleware.AuthMiddleware())
 	{
+		// Actualización de perfil de usuario
+		protected.PUT("/user/profile", middleware.StandardRateLimit(), handlers.UserUpdate.Handle)
+		
 		// CRUD de servicios
 		protected.POST("/services", middleware.StandardRateLimit(), handlers.ServiceCreate.Handle)
 		protected.PUT("/services/:id", middleware.StandardRateLimit(), handlers.ServiceUpdate.Handle)

@@ -9,7 +9,9 @@ import (
 
 type User interface {
 	GetByEmail(ctx context.Context, email string) (*entities.User, error)
+	GetByID(ctx context.Context, userID int64) (*entities.User, error)
 	Create(ctx context.Context, user *entities.UserRegister) (*entities.User, error)
+	Update(ctx context.Context, userID int64, userUpdate *entities.UserUpdate) (*entities.User, error)
 	GetPermissions(ctx context.Context, userID int64) ([]string, error)
 	GetRole(ctx context.Context, userID int64) (string, error)
 	CreatePasswordResetToken(ctx context.Context, userID int64) (string, time.Time, error)

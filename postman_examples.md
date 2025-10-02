@@ -123,6 +123,47 @@ Authorization: Bearer {token}
 
 **Nota importante:** Este endpoint elimina el servicio de manera DEFINITIVA de la base de datos. Para cambiar el estado del servicio a inactivo, usar el endpoint PATCH `/services/{id}/status`.
 
+### Actualizar Perfil de Usuario
+```
+PUT http://localhost:8080/api/user/profile
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+    "name": "Juan Carlos Pérez",
+    "email": "juan.carlos@example.com",
+    "locality": "La Plata", 
+    "province": "Buenos Aires",
+    "phone": "+54 221 1234-5678"
+}
+```
+
+**Respuesta esperada (200 OK):**
+```json
+{
+    "message": "User updated successfully",
+    "data": {
+        "id": 1,
+        "name": "Juan Carlos Pérez",
+        "email": "juan.carlos@example.com",
+        "locality": "La Plata",
+        "province": "Buenos Aires", 
+        "phone": "+54 221 1234-5678",
+        "created_at": "2025-01-01T10:00:00Z",
+        "updated_at": "2025-01-01T15:30:00Z"
+    }
+}
+```
+
+**Errores posibles:**
+- 400 Bad Request: Datos inválidos o email ya en uso por otro usuario
+- 401 Unauthorized: Token inválido o no proporcionado
+- 404 Not Found: Usuario no encontrado
+- 409 Conflict: Email ya está en uso
+- 500 Internal Server Error: Error del servidor
+
+**Nota:** Todos los campos son opcionales. Solo se actualizarán los campos enviados en la petición.
+
 ## Importar en Postman
 
 1. Abrir Postman
@@ -237,6 +278,33 @@ Authorization: Bearer {token}
                     "host": ["localhost"],
                     "port": "8080",
                     "path": ["api", "services", "1"]
+                }
+            }
+        },
+        {
+            "name": "Update User Profile",
+            "request": {
+                "method": "PUT",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {token}"
+                    },
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"name\": \"Juan Carlos Pérez\",\n    \"email\": \"juan.carlos@example.com\",\n    \"locality\": \"La Plata\",\n    \"province\": \"Buenos Aires\",\n    \"phone\": \"+54 221 1234-5678\"\n}"
+                },
+                "url": {
+                    "raw": "http://localhost:8080/api/user/profile",
+                    "protocol": "http",
+                    "host": ["localhost"],
+                    "port": "8080",
+                    "path": ["api", "user", "profile"]
                 }
             }
         }

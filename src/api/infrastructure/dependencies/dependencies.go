@@ -8,6 +8,7 @@ import (
 	"iycds2025_api/src/api/core/usecases/password"
 	"iycds2025_api/src/api/core/usecases/register"
 	"iycds2025_api/src/api/core/usecases/service"
+	"iycds2025_api/src/api/core/usecases/user"
 	"iycds2025_api/src/api/infrastructure/entrypoints/api"
 	apiHandlers "iycds2025_api/src/api/infrastructure/entrypoints/api/handlers"
 	"iycds2025_api/src/api/repositories/database"
@@ -17,6 +18,7 @@ type HandlerContainer struct {
 	Ping                api.Handler
 	UserLogin           api.Handler
 	UserRegister        api.Handler
+	UserUpdate          api.Handler
 	PasswordForgot      api.Handler
 	PasswordReset       api.Handler
 	ServiceCreate       api.Handler
@@ -68,6 +70,10 @@ func Start() *HandlerContainer {
 		User: userRepo,
 	}
 
+	userUpdateUseCase := &user.UpdateUserImpl{
+		User: userRepo,
+	}
+
 	// Service use cases
 	createServiceUseCase := &service.CreateServiceImpl{
 		Service: serviceRepo,
@@ -106,6 +112,9 @@ func Start() *HandlerContainer {
 	}
 	handlers.UserRegister = &apiHandlers.UserRegister{
 		UseCase: userRegisterUseCase,
+	}
+	handlers.UserUpdate = &apiHandlers.UserUpdateHandler{
+		UpdateUser: userUpdateUseCase,
 	}
 	handlers.PasswordForgot = &apiHandlers.PasswordForgot{
 		UseCase: forgotPasswordUseCase,
