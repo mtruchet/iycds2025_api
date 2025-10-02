@@ -76,7 +76,7 @@ func Start() *HandlerContainer {
 		Service: serviceRepo,
 	}
 
-	deleteServiceUseCase := &service.DeleteServiceImpl{
+	updateStatusUseCase := &service.UpdateServiceStatusImpl{
 		Service: serviceRepo,
 	}
 
@@ -114,8 +114,8 @@ func Start() *HandlerContainer {
 	handlers.ServiceUpdate = &apiHandlers.ServiceUpdateHandler{
 		UpdateService: updateServiceUseCase,
 	}
-	handlers.ServiceDelete = &apiHandlers.ServiceDeleteHandler{
-		DeleteService: deleteServiceUseCase,
+	handlers.ServiceDelete = &apiHandlers.ServiceUpdateStatusHandler{
+		UpdateStatusService: updateStatusUseCase,
 	}
 	handlers.ServiceList = &apiHandlers.ServiceListHandler{
 		ListMyServices: listMyServicesUseCase,
