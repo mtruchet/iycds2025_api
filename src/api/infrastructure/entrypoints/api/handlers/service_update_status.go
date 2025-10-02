@@ -4,14 +4,11 @@ import (
 	"net/http"
 	"strconv"
 
+	"iycds2025_api/src/api/core/entities"
 	"iycds2025_api/src/api/core/usecases/service"
 
 	"github.com/gin-gonic/gin"
 )
-
-type ServiceUpdateStatusRequest struct {
-	Status string `json:"status" binding:"required"`
-}
 
 type ServiceUpdateStatusHandler struct {
 	UpdateStatusService service.UpdateServiceStatus
@@ -38,7 +35,7 @@ func (h *ServiceUpdateStatusHandler) Handle(c *gin.Context) {
 	}
 
 	// Parsear el body de la request
-	var req ServiceUpdateStatusRequest
+	var req entities.ServiceUpdateStatus
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Invalid request body: " + err.Error(),

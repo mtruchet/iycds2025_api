@@ -62,6 +62,11 @@ type ServiceResponse struct {
 	UpdatedAt    time.Time              `json:"updated_at"`
 }
 
+// ServiceUpdateStatus representa la solicitud de actualización de estado
+type ServiceUpdateStatus struct {
+	Status string `json:"status" validate:"required,oneof=active inactive"`
+}
+
 // ServiceListResponse representa la respuesta de lista de servicios
 type ServiceListResponse struct {
 	Services []ServiceResponse `json:"services"`
