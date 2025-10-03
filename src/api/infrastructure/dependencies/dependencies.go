@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"iycds2025_api/configs"
+	"iycds2025_api/src/api/core/usecases/appointment"
 	"iycds2025_api/src/api/core/usecases/login"
 	"iycds2025_api/src/api/core/usecases/password"
 	"iycds2025_api/src/api/core/usecases/register"
@@ -15,20 +16,26 @@ import (
 )
 
 type HandlerContainer struct {
-	Ping                api.Handler
-	UserLogin           api.Handler
-	UserRegister        api.Handler
-	UserUpdate          api.Handler
-	PasswordForgot      api.Handler
-	PasswordReset       api.Handler
-	ServiceCreate       api.Handler
-	ServiceUpdate       api.Handler
-	ServiceDelete       api.Handler
-	ServiceUpdateStatus api.Handler
-	ServiceList         api.Handler
-	ServiceListAll      api.Handler
-	ServiceGetByID      api.Handler
-	Categories          api.Handler
+	Ping                        api.Handler
+	UserLogin                   api.Handler
+	UserRegister                api.Handler
+	UserUpdate                  api.Handler
+	PasswordForgot              api.Handler
+	PasswordReset               api.Handler
+	ServiceCreate               api.Handler
+	ServiceUpdate               api.Handler
+	ServiceDelete               api.Handler
+	ServiceUpdateStatus         api.Handler
+	ServiceList                 api.Handler
+	ServiceListAll              api.Handler
+	ServiceGetByID              api.Handler
+	ServiceAvailability         api.Handler
+	ServiceCalendar             api.Handler
+	ServiceAppointments         api.Handler
+	AppointmentCreate           api.Handler
+	AppointmentList             api.Handler
+	AppointmentUpdateStatus     api.Handler
+	Categories                  api.Handler
 }
 
 func Start() *HandlerContainer {
@@ -41,6 +48,7 @@ func Start() *HandlerContainer {
 	}
 
 	serviceRepo := database.NewServiceRepository(db)
+	appointmentRepo := database.NewAppointmentRepository(db)
 
 	// Services
 	emailService := configs.NewEmailService()
@@ -103,6 +111,33 @@ func Start() *HandlerContainer {
 		Service: serviceRepo,
 	}
 
+	getServiceCalendarUseCase := service.NewGetServiceCalendarUseCase(serviceRepo, appointmentRepo)
+
+	// Appointment use cases
+	getServiceAvailabilityUseCase := &appointment.GetServiceAvailabilityImpl{
+		Service:     serviceRepo,
+		Appointment: appointmentRepo,
+	}
+
+	createAppointmentUseCase := &appointment.CreateAppointmentImpl{
+		Service:     serviceRepo,
+		Appointment: appointmentRepo,
+	}
+
+	listMyAppointmentsUseCase := &appointment.ListMyAppointmentsImpl{
+		Service:     serviceRepo,
+		Appointment: appointmentRepo,
+	}
+
+	listServiceAppointmentsUseCase := &appointment.ListServiceAppointmentsImpl{
+		Service:     serviceRepo,
+		Appointment: appointmentRepo,
+	}
+
+	updateAppointmentStatusUseCase := &appointment.UpdateAppointmentStatusImpl{
+		Appointment: appointmentRepo,
+	}
+
 	// Handlers
 	handlers := HandlerContainer{}
 
@@ -142,6 +177,24 @@ func Start() *HandlerContainer {
 	}
 	handlers.ServiceGetByID = &apiHandlers.ServiceGetByIDHandler{
 		GetServiceByID: getServiceByIDUseCase,
+	}
+	handlers.ServiceAvailability = &apiHandlers.ServiceAvailabilityHandler{
+		GetServiceAvailability: getServiceAvailabilityUseCase,
+	}
+	handlers.ServiceCalendar = &apiHandlers.ServiceCalendarHandler{
+		GetServiceCalendar: getServiceCalendarUseCase,
+	}
+	handlers.ServiceAppointments = &apiHandlers.ServiceAppointmentsHandler{
+		ListServiceAppointments: listServiceAppointmentsUseCase,
+	}
+	handlers.AppointmentCreate = &apiHandlers.AppointmentCreateHandler{
+		CreateAppointment: createAppointmentUseCase,
+	}
+	handlers.AppointmentList = &apiHandlers.AppointmentListHandler{
+		ListMyAppointments: listMyAppointmentsUseCase,
+	}
+	handlers.AppointmentUpdateStatus = &apiHandlers.AppointmentUpdateStatusHandler{
+		UpdateAppointmentStatus: updateAppointmentStatusUseCase,
 	}
 	handlers.Categories = &apiHandlers.CategoriesHandler{}
 

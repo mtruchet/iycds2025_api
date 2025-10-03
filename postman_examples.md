@@ -164,6 +164,150 @@ Content-Type: application/json
 
 **Nota:** Todos los campos son opcionales. Solo se actualizarán los campos enviados en la petición.
 
+### Obtener Disponibilidad de Servicio
+```
+GET http://localhost:8080/api/services/1/availability?date=2025-10-15
+```
+
+**Respuesta esperada (200 OK):**
+```json
+{
+    "message": "Service availability retrieved successfully",
+    "data": {
+        "date": "2025-10-15",
+        "day_of_week": "tuesday",
+        "time_slots": [
+            {"time": "08:00-08:30", "available": true},
+            {"time": "08:30-09:00", "available": false},
+            {"time": "09:00-09:30", "available": true}
+        ]
+    }
+}
+```
+
+### Obtener Calendario de Servicio (30 días)
+```
+GET http://localhost:8080/api/services/1/calendar
+```
+
+**Respuesta esperada (200 OK):**
+```json
+{
+    "message": "Service calendar retrieved successfully",
+    "data": {
+        "service_id": 1,
+        "service_title": "Clases de Programación",
+        "start_date": "2025-10-02",
+        "end_date": "2025-10-31",
+        "days": [
+            {
+                "date": "2025-10-02",
+                "day_of_week": "miércoles",
+                "has_availability": true,
+                "available_slots": 8,
+                "total_slots": 8
+            },
+            {
+                "date": "2025-10-03",
+                "day_of_week": "jueves",
+                "has_availability": true,
+                "available_slots": 6,
+                "total_slots": 8
+            },
+            {
+                "date": "2025-10-04",
+                "day_of_week": "viernes",
+                "has_availability": false,
+                "available_slots": 0,
+                "total_slots": 0
+            }
+        ]
+    }
+}
+```
+
+**Descripción del endpoint:**
+- Retorna los próximos 30 días desde la fecha actual
+- `has_availability`: indica si el día tiene horarios configurados
+- `available_slots`: número de slots libres (sin appointments)
+- `total_slots`: número total de slots configurados para ese día
+- `day_of_week`: día de la semana en español
+- Útil para mostrar calendarios en el frontend con vista general de disponibilidad
+
+### Crear Cita/Appointment
+```
+POST http://localhost:8080/api/appointments
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+    "service_id": 1,
+    "date": "2025-10-15",
+    "time_slot": "09:00-09:30",
+    "notes": "Necesito ayuda con programación en Go"
+}
+```
+
+**Respuesta esperada (201 Created):**
+```json
+{
+    "message": "Appointment created successfully",
+    "data": {
+        "id": 1,
+        "service": {
+            "id": 1,
+            "title": "Clases de Programación",
+            "description": "Clases personalizadas...",
+            "category": "educacion",
+            "price": 2500.0
+        },
+        "client_id": 2,
+        "provider_id": 1,
+        "date": "2025-10-15",
+        "time_slot": "09:00-09:30",
+        "status": "pending",
+        "notes": "Necesito ayuda con programación en Go"
+    }
+}
+```
+
+### Listar Mis Citas (Cliente)
+```
+GET http://localhost:8080/api/my-appointments
+Authorization: Bearer {token}
+```
+
+### Ver Citas de Mi Servicio (Proveedor)
+```
+GET http://localhost:8080/api/services/1/appointments
+Authorization: Bearer {token}
+```
+
+### Aceptar/Rechazar Cita (Proveedor)
+```
+PUT http://localhost:8080/api/appointments/1/status
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+    "status": "accepted"
+}
+```
+
+**Estados válidos:**
+- `accepted` - Solo proveedor puede aceptar citas pendientes
+- `rejected` - Solo proveedor puede rechazar citas pendientes
+- `cancelled` - Cliente o proveedor pueden cancelar
+- `completed` - Solo proveedor puede marcar como completada
+
+**Errores comunes:**
+- 400 Bad Request: Datos inválidos o estado no permitido
+- 401 Unauthorized: Token inválido
+- 403 Forbidden: Sin permisos para la acción
+- 404 Not Found: Cita o servicio no encontrado
+- 409 Conflict: Horario ya ocupado
+- 500 Internal Server Error: Error del servidor
+
 ## Importar en Postman
 
 1. Abrir Postman
@@ -305,6 +449,132 @@ Content-Type: application/json
                     "host": ["localhost"],
                     "port": "8080",
                     "path": ["api", "user", "profile"]
+                }
+            }
+        },
+        {
+            "name": "Get Service Availability",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "http://localhost:8080/api/services/1/availability?date=2025-10-15",
+                    "protocol": "http",
+                    "host": ["localhost"],
+                    "port": "8080",
+                    "path": ["api", "services", "1", "availability"],
+                    "query": [
+                        {
+                            "key": "date",
+                            "value": "2025-10-15"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Get Service Calendar",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "http://localhost:8080/api/services/1/calendar",
+                    "protocol": "http",
+                    "host": ["localhost"],
+                    "port": "8080",
+                    "path": ["api", "services", "1", "calendar"]
+                }
+            }
+        },
+        {
+            "name": "Create Appointment",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {token}"
+                    },
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"service_id\": 1,\n    \"date\": \"2025-10-15\",\n    \"time_slot\": \"09:00-09:30\",\n    \"notes\": \"Necesito ayuda con programación en Go\"\n}"
+                },
+                "url": {
+                    "raw": "http://localhost:8080/api/appointments",
+                    "protocol": "http",
+                    "host": ["localhost"],
+                    "port": "8080",
+                    "path": ["api", "appointments"]
+                }
+            }
+        },
+        {
+            "name": "List My Appointments",
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {token}"
+                    }
+                ],
+                "url": {
+                    "raw": "http://localhost:8080/api/my-appointments",
+                    "protocol": "http",
+                    "host": ["localhost"],
+                    "port": "8080",
+                    "path": ["api", "my-appointments"]
+                }
+            }
+        },
+        {
+            "name": "View Service Appointments",
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {token}"
+                    }
+                ],
+                "url": {
+                    "raw": "http://localhost:8080/api/services/1/appointments",
+                    "protocol": "http",
+                    "host": ["localhost"],
+                    "port": "8080",
+                    "path": ["api", "services", "1", "appointments"]
+                }
+            }
+        },
+        {
+            "name": "Update Appointment Status",
+            "request": {
+                "method": "PUT",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {token}"
+                    },
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"status\": \"accepted\"\n}"
+                },
+                "url": {
+                    "raw": "http://localhost:8080/api/appointments/1/status",
+                    "protocol": "http",
+                    "host": ["localhost"],
+                    "port": "8080",
+                    "path": ["api", "appointments", "1", "status"]
                 }
             }
         }
